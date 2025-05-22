@@ -75,7 +75,7 @@ export default function RealtimeMonitor() {
     <div className="aspect-video rounded-xl bg-muted/50 p-5">
       <div className="flex flex-col gap-2">
         <div className="flex justify-between items-center">
-          <h2 className="text-lg font-bold">Monring</h2>
+          <h2 className="text-lg font-bold">Monitoring</h2>
           <Button 
             variant="outline"
             size="sm"

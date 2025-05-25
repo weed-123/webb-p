@@ -1,148 +1,111 @@
-"use client";
-
-import * as React from "react";
+import { useState } from "react";
 import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
-import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-
-const InfoCard: React.FC<{ title: string; value: string }> = ({ title, value }) => (
-  <div className="flex flex-row justify-between p-3 rounded-lg bg-primary/20 text-primary">
-    <h6 className="font-semibold">{title}</h6>
-    <h6>{value}</h6>
-  </div>
-);
-
-type MockDataType = {
-  [key: string]: {
-    operationStart: string;
-    operationEnd: string;
-    totalAreaCovered: string;
-    treatmentEfficiency: string;
-    batteryUsage: string;
-    laserOperation: string;
-    averagePower: string;
-    systemUptime: string;
-    alerts: string[];
-  };
-};
+import { cn } from "@/lib/utils";
 
 export default function DailyReport() {
-  const [selectedDate, setSelectedDate] = React.useState<Date | undefined>(undefined);
+  const [date, setDate] = useState<Date | undefined>(new Date());
 
-  const DatePicker: React.FC = () => {
-    return (
-      <Popover>
-        <PopoverTrigger asChild>
-          <Button
-            variant="outline"
-            className={cn(
-              "w-[240px] justify-start text-left font-normal",
-              !selectedDate && "text-muted-foreground"
-            )}
-          >
-            <CalendarIcon />
-            {selectedDate ? format(selectedDate, "MM-dd-yyyy") : <span>Pick a date</span>}
-          </Button>
-        </PopoverTrigger>
-        <PopoverContent className="w-auto p-0" align="start">
-          <Calendar
-            mode="single"
-            selected={selectedDate}
-            onSelect={setSelectedDate}
-            initialFocus
-          />
-        </PopoverContent>
-      </Popover>
-    );
+  const summary = {
+    start: "08:00 AM",
+    end: "05:00 PM",
+    area: "13.5 ha",
+    efficiency: "85%",
   };
 
-  // Update the mockData declaration
-  const mockData: MockDataType = {
-    "02-27-2025": {
-      operationStart: "08:00 AM",
-      operationEnd: "05:00 PM",
-      totalAreaCovered: "13.5 ha",
-      treatmentEfficiency: "85%",
-      batteryUsage: "75%",
-      laserOperation: "542 instances",
-      averagePower: "65W",
-      systemUptime: "98.5%",
-      alerts: [
-        "Low battery warning at 04:30 PM",
-        "Obstacle detected at 02:15 PM",
-        "System maintenance recommended",
-      ],
-    },
-    "02-28-2025": {
-      operationStart: "08:15 AM",
-      operationEnd: "05:15 PM",
-      totalAreaCovered: "15.0 ha",
-      treatmentEfficiency: "90%",
-      batteryUsage: "70%",
-      laserOperation: "600 instances",
-      averagePower: "70W",
-      systemUptime: "99.0%",
-      alerts: [
-        "Battery fully charged",
-        "No obstacles detected",
-        "System functioning optimally",
-      ],
-    },
+  const performance = {
+    battery: "75%",
+    laser: "542 instances",
+    power: "65W",
+    uptime: "98.5%",
   };
+
+  const alerts = [
+    "Low battery warning at 04:30 PM",
+    "Obstacle detected at 02:15 PM",
+    "System maintenance recommended",
+  ];
 
   return (
-    <div className="text-sm">
-      <h1 className="text-lg font-bold mb-5">Daily Report</h1>
-
-      <div className="flex flex-row justify-between items-center bg-secondary/80 text-primary rounded-lg p-4 my-5">
-        <p>Select a date</p>
-        <DatePicker />
+    <div className="space-y-4">
+      <div>
+        <h2 className="text-lg font-semibold mb-1">Daily Report</h2>
+        <div className="flex items-center gap-4">
+          <span className="text-sm text-muted-foreground">Select a date</span>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                variant={"outline"}
+                className={cn(
+                  "w-[260px] justify-start text-left font-normal",
+                  !date && "text-muted-foreground"
+                )}
+              >
+                <CalendarIcon className="mr-2 h-4 w-4" />
+                {date ? format(date, "PPP") : <span>Pick a date</span>}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="start">
+              <Calendar mode="single" selected={date} onSelect={setDate} initialFocus />
+            </PopoverContent>
+          </Popover>
+        </div>
       </div>
 
-      <div className="flex flex-col gap-5">
-        {selectedDate && (
-          <>
-            {mockData[format(selectedDate, "MM-dd-yyyy") as keyof MockDataType] ? (
-              <>
-                <div className="bg-secondary/80 text-primary rounded-lg p-6">
-                  <h1 className="text-lg font-bold mb-5">Operation Summary</h1>
-                  <div className="grid grid-cols-2 gap-3">
-                    <InfoCard title="Operation Start" value={mockData[format(selectedDate, "MM-dd-yyyy") as keyof MockDataType].operationStart} />
-                    <InfoCard title="Operation End" value={mockData[format(selectedDate, "MM-dd-yyyy") as keyof MockDataType].operationEnd} />
-                    <InfoCard title="Total Area Covered" value={mockData[format(selectedDate, "MM-dd-yyyy") as keyof MockDataType].totalAreaCovered} />
-                    <InfoCard title="Treatment Efficiency" value={mockData[format(selectedDate, "MM-dd-yyyy") as keyof MockDataType].treatmentEfficiency} />
-                  </div>
-                </div>
+      <div className="space-y-4">
+        <div className="rounded-xl bg-muted/40 p-4">
+          <h3 className="text-base font-semibold mb-2">Operation Summary</h3>
+          <div className="grid grid-cols-2 gap-2">
+            <div className="rounded-md bg-muted px-4 py-2 text-sm font-medium">
+              Operation Start: <span className="font-normal">{summary.start}</span>
+            </div>
+            <div className="rounded-md bg-muted px-4 py-2 text-sm font-medium">
+              Operation End: <span className="font-normal">{summary.end}</span>
+            </div>
+            <div className="rounded-md bg-muted px-4 py-2 text-sm font-medium">
+              Total Area Covered: <span className="font-normal">{summary.area}</span>
+            </div>
+            <div className="rounded-md bg-muted px-4 py-2 text-sm font-medium">
+              Treatment Efficiency: <span className="font-normal">{summary.efficiency}</span>
+            </div>
+          </div>
+        </div>
 
-                <div className="bg-secondary/80 rounded-lg p-6">
-                  <h1 className="text-lg font-bold mb-5">System Performance</h1>
-                  <div className="grid grid-cols-2 gap-3">
-                    <InfoCard title="Battery Usage" value={mockData[format(selectedDate, "MM-dd-yyyy") as keyof MockDataType].batteryUsage} />
-                    <InfoCard title="Laser Operation" value={mockData[format(selectedDate, "MM-dd-yyyy") as keyof MockDataType].laserOperation} />
-                    <InfoCard title="Average Power" value={mockData[format(selectedDate, "MM-dd-yyyy") as keyof MockDataType].averagePower} />
-                    <InfoCard title="System Uptime" value={mockData[format(selectedDate, "MM-dd-yyyy") as keyof MockDataType].systemUptime} />
-                  </div>
-                </div>
+        <div className="rounded-xl bg-muted/40 p-4">
+          <h3 className="text-base font-semibold mb-2">System Performance</h3>
+          <div className="grid grid-cols-2 gap-2">
+            <div className="rounded-md bg-muted px-4 py-2 text-sm font-medium">
+              Battery Usage: <span className="font-normal">{performance.battery}</span>
+            </div>
+            <div className="rounded-md bg-muted px-4 py-2 text-sm font-medium">
+              Laser Operations: <span className="font-normal">{performance.laser}</span>
+            </div>
+            <div className="rounded-md bg-muted px-4 py-2 text-sm font-medium">
+              Average Power: <span className="font-normal">{performance.power}</span>
+            </div>
+            <div className="rounded-md bg-muted px-4 py-2 text-sm font-medium">
+              System Uptime: <span className="font-normal">{performance.uptime}</span>
+            </div>
+          </div>
+        </div>
 
-                <div className="bg-secondary/80 rounded-lg p-6">
-                  <h1 className="text-lg font-bold mb-5">Alert & Notifications</h1>
-                  <div className="grid grid-cols-1 gap-3">
-                    {mockData[format(selectedDate, "MM-dd-yyyy") as keyof MockDataType].alerts.map((alert, index) => (
-                      <InfoCard key={index} title={alert} value="" />
-                    ))}
-                  </div>
-                </div>
-              </>
+        <div className="rounded-xl bg-muted/40 p-4">
+          <h3 className="text-base font-semibold mb-2">Alerts & Notifications</h3>
+          <ul className="list-disc pl-6 text-sm text-muted-foreground">
+            {alerts.length ? (
+              alerts.map((alert, index) => <li key={index}>{alert}</li>)
             ) : (
-              <div className="flex items-center justify-center bg-secondary/80 text-primary rounded-lg p-6">
-                <h1 className="text-lg font-bold">No Data Available</h1>
-              </div>
+              <li>No alerts recorded.</li>
             )}
-          </>
-        )}
+          </ul>
+        </div>
       </div>
     </div>
   );

@@ -12,10 +12,24 @@ import { cn } from "@/lib/utils";
 import { db } from "@/lib/firebase";
 import { ref, get } from "firebase/database";
 
+type Summary = {
+  start?: string;
+  end?: string;
+  area?: string;
+  efficiency?: string;
+};
+
+type Performance = {
+  battery?: string;
+  laser?: string;
+  power?: string;
+  uptime?: string;
+};
+
 export default function DailyReport() {
   const [date, setDate] = useState<Date | undefined>(new Date());
-  const [summary, setSummary] = useState<any>({});
-  const [performance, setPerformance] = useState<any>({});
+  const [summary, setSummary] = useState<Summary>({});
+  const [performance, setPerformance] = useState<Performance>({});
   const [alerts, setAlerts] = useState<string[]>([]);
 
   useEffect(() => {

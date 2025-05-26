@@ -12,24 +12,36 @@ import { cn } from "@/lib/utils";
 import { db } from "@/lib/firebase";
 import { ref, get } from "firebase/database";
 
-type Summary = {
-  start?: string;
-  end?: string;
-  area?: string;
-  efficiency?: string;
-};
+interface ReportSummary {
+  start_time?: string;
+  end_time?: string;
+  total_area?: number;
+  treatment_efficiency?: number;
+}
 
-type Performance = {
-  battery?: string;
-  laser?: string;
-  power?: string;
-  uptime?: string;
-};
+interface ReportPerformance {
+  battery_usage?: number;
+  laser_operations?: number;
+  average_power?: number;
+  system_uptime?: number;
+}
 
 export default function DailyReport() {
   const [date, setDate] = useState<Date | undefined>(new Date());
-  const [summary, setSummary] = useState<Summary>({});
-  const [performance, setPerformance] = useState<Performance>({});
+  const [summary, setSummary] = useState<{
+    start: string;
+    end: string;
+    area: string;
+    efficiency: string;
+  }>({ start: "-", end: "-", area: "-", efficiency: "-" });
+
+  const [performance, setPerformance] = useState<{
+    battery: string;
+    laser: string;
+    power: string;
+    uptime: string;
+  }>({ battery: "-", laser: "-", power: "-", uptime: "-" });
+
   const [alerts, setAlerts] = useState<string[]>([]);
 
   useEffect(() => {
@@ -38,27 +50,32 @@ export default function DailyReport() {
       const dateKey = format(date, "MM-dd-yyyy");
       const reportRef = ref(db, `/report/${dateKey}`);
       const snapshot = await get(reportRef);
+
       if (snapshot.exists()) {
-        const data = snapshot.val();
+        const data = snapshot.val() as ReportSummary & ReportPerformance & { alerts?: string[] };
+
         setSummary({
-          start: data.start_time || "-",
-          end: data.end_time || "-",
-          area: data.total_area ? `${data.total_area} ha` : "-",
-          efficiency: data.treatment_efficiency ? `${data.treatment_efficiency}%` : "-",
+          start: data.start_time ?? "-",
+          end: data.end_time ?? "-",
+          area: data.total_area !== undefined ? `${data.total_area} ha` : "-",
+          efficiency: data.treatment_efficiency !== undefined ? `${data.treatment_efficiency}%` : "-",
         });
+
         setPerformance({
-          battery: data.battery_usage ? `${data.battery_usage}%` : "-",
-          laser: data.laser_operations ? `${data.laser_operations} instances` : "-",
-          power: data.average_power ? `${data.average_power}W` : "-",
-          uptime: data.system_uptime ? `${data.system_uptime}%` : "-",
+          battery: data.battery_usage !== undefined ? `${data.battery_usage}%` : "-",
+          laser: data.laser_operations !== undefined ? `${data.laser_operations} instances` : "-",
+          power: data.average_power !== undefined ? `${data.average_power}W` : "-",
+          uptime: data.system_uptime !== undefined ? `${data.system_uptime}%` : "-",
         });
+
         setAlerts(data.alerts || []);
       } else {
-        setSummary({});
-        setPerformance({});
+        setSummary({ start: "-", end: "-", area: "-", efficiency: "-" });
+        setPerformance({ battery: "-", laser: "-", power: "-", uptime: "-" });
         setAlerts([]);
       }
     };
+
     fetchReport();
   }, [date]);
 
@@ -71,11 +88,8 @@ export default function DailyReport() {
           <Popover>
             <PopoverTrigger asChild>
               <Button
-                variant={"outline"}
-                className={cn(
-                  "w-[260px] justify-start text-left font-normal",
-                  !date && "text-muted-foreground"
-                )}
+                variant="outline"
+                className={cn("w-[260px] justify-start text-left font-normal", !date && "text-muted-foreground")}
               >
                 <CalendarIcon className="mr-2 h-4 w-4" />
                 {date ? format(date, "PPP") : <span>Pick a date</span>}
@@ -93,16 +107,16 @@ export default function DailyReport() {
           <h3 className="text-base font-semibold mb-2">Operation Summary</h3>
           <div className="grid grid-cols-2 gap-2">
             <div className="rounded-md bg-muted px-4 py-2 text-sm font-medium">
-              Operation Start: <span className="font-normal">{summary.start || "-"}</span>
+              Operation Start: <span className="font-normal">{summary.start}</span>
             </div>
             <div className="rounded-md bg-muted px-4 py-2 text-sm font-medium">
-              Operation End: <span className="font-normal">{summary.end || "-"}</span>
+              Operation End: <span className="font-normal">{summary.end}</span>
             </div>
             <div className="rounded-md bg-muted px-4 py-2 text-sm font-medium">
-              Total Area Covered: <span className="font-normal">{summary.area || "-"}</span>
+              Total Area Covered: <span className="font-normal">{summary.area}</span>
             </div>
             <div className="rounded-md bg-muted px-4 py-2 text-sm font-medium">
-              Treatment Efficiency: <span className="font-normal">{summary.efficiency || "-"}</span>
+              Treatment Efficiency: <span className="font-normal">{summary.efficiency}</span>
             </div>
           </div>
         </div>
@@ -111,16 +125,16 @@ export default function DailyReport() {
           <h3 className="text-base font-semibold mb-2">System Performance</h3>
           <div className="grid grid-cols-2 gap-2">
             <div className="rounded-md bg-muted px-4 py-2 text-sm font-medium">
-              Battery Usage: <span className="font-normal">{performance.battery || "-"}</span>
+              Battery Usage: <span className="font-normal">{performance.battery}</span>
             </div>
             <div className="rounded-md bg-muted px-4 py-2 text-sm font-medium">
-              Laser Operations: <span className="font-normal">{performance.laser || "-"}</span>
+              Laser Operations: <span className="font-normal">{performance.laser}</span>
             </div>
             <div className="rounded-md bg-muted px-4 py-2 text-sm font-medium">
-              Average Power: <span className="font-normal">{performance.power || "-"}</span>
+              Average Power: <span className="font-normal">{performance.power}</span>
             </div>
             <div className="rounded-md bg-muted px-4 py-2 text-sm font-medium">
-              System Uptime: <span className="font-normal">{performance.uptime || "-"}</span>
+              System Uptime: <span className="font-normal">{performance.uptime}</span>
             </div>
           </div>
         </div>
@@ -128,11 +142,9 @@ export default function DailyReport() {
         <div className="rounded-xl bg-muted/40 p-4">
           <h3 className="text-base font-semibold mb-2">Alerts & Notifications</h3>
           <ul className="list-disc pl-6 text-sm text-muted-foreground">
-            {alerts.length ? (
-              alerts.map((alert, index) => <li key={index}>{alert}</li>)
-            ) : (
-              <li>No alerts recorded.</li>
-            )}
+            {alerts.length > 0 ? alerts.map((alert, index) => (
+              <li key={index}>{alert}</li>
+            )) : <li>No alerts recorded.</li>}
           </ul>
         </div>
       </div>

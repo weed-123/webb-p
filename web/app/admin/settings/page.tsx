@@ -47,12 +47,14 @@ export default function AdminSettings() {
   const [userToDelete, setUserToDelete] = useState<UserData | null>(null);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [isDeleting, setIsDeleting] = useState(false);
   const [editUser, setEditUser] = useState<UserData | null>(null);
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [editName, setEditName] = useState('');
   const [editRole, setEditRole] = useState('');
   const [systemUptime, setSystemUptime] = useState<number | null>(null);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [laserPower, setLaserPower] = useState<number>(0);
 
   useEffect(() => {
@@ -115,7 +117,7 @@ export default function AdminSettings() {
 
     return () => clearInterval(interval);
   }, []);
-
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleSaveSettings = async () => {
     const controlRef = ref(db, 'control/laser');
     await update(controlRef, { power: laserPower });

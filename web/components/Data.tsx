@@ -43,45 +43,68 @@ export default function Data() {
     }
   };
 
-	return (
-	  <div className="rounded-xl bg-muted/50 p-5">
-      <div className="flex flex-col gap-2">
-        <h2 className="text-lg font-bold">Data</h2>
-        <Separator className="my-3" />
+return (
+  <div className="rounded-xl bg-muted/50 p-5">
+    <div className="flex flex-col gap-4">
+      <h2 className="text-lg font-bold">Data</h2>
+      <Separator className="my-2" />
 
-        {debugInfo && (
-          <div className="bg-muted p-2 text-xs mb-2 rounded">
-            <p className="font-semibold">Debug:</p>
-            <p className="whitespace-pre-wrap">{debugInfo}</p>
-          </div>
-        )}
-
-        <div className="flex flex-col gap-2 bg-muted rounded-xl p-5">
-          <h3 className="text-sm">Performance Metrics</h3>
-          <div className="flex flex-col gap-2 text-xs text-muted-foreground">
-            <p>Efficiency: 85%</p>
-            <p>Accuracy: 95%</p>
-            <p>Coverage: 1.5ha/hr</p>
-          </div>
+      {debugInfo && (
+        <div className="bg-neutral-800/40 p-3 text-xs mb-2 rounded border border-yellow-600 text-yellow-300">
+          <p className="font-semibold">Debug Info:</p>
+          <p className="whitespace-pre-wrap">{debugInfo}</p>
         </div>
+      )}
 
-        <div className="flex flex-col gap-2 bg-muted rounded-xl p-5">
-          <h3 className="text-sm">Reports Generation</h3>
-          <div className="flex flex-col gap-2">
-            <Button onClick={redirectToReports} disabled={isLoading}>
-              {isLoading ? 'Loading...' : 'Generate Daily Report'}
-            </Button>
-            <Button onClick={redirectToReports} disabled={isLoading}>
-              {isLoading ? 'Loading...' : 'Export Performance Data'}
-            </Button>
-            <Button onClick={redirectToReports} disabled={isLoading}>
-              {isLoading ? 'Loading...' : 'System Status Report'}
-            </Button>
+      {/* Performance Metrics */}
+      <div className="rounded-xl p-5 bg-neutral-900 border border-gray-700 shadow-sm">
+        <h3 className="text-sm font-medium text-white mb-2">📊 Performance Metrics</h3>
+        <div className="grid grid-cols-1 gap-2 text-sm text-muted-foreground">
+          <div className="flex justify-between">
+            <span>Efficiency</span>
+            <span className="text-white font-semibold">85%</span>
+          </div>
+          <div className="flex justify-between">
+            <span>Accuracy</span>
+            <span className="text-white font-semibold">95%</span>
+          </div>
+          <div className="flex justify-between">
+            <span>Coverage</span>
+            <span className="text-white font-semibold">1.5 ha/hr</span>
           </div>
         </div>
       </div>
-	  </div>
-	);
+
+      {/* Reports Generation */}
+      <div className="rounded-xl p-5 bg-neutral-900 border border-gray-700 shadow-sm">
+        <h3 className="text-sm font-medium text-white mb-3">📝 Reports Generation</h3>
+        <div className="grid grid-cols-1 gap-2">
+          <Button
+            className="bg-blue-600 hover:bg-blue-700 text-white"
+            onClick={redirectToReports}
+            disabled={isLoading}
+          >
+            {isLoading ? 'Loading...' : 'Generate Daily Report'}
+          </Button>
+          <Button
+            className="bg-emerald-600 hover:bg-emerald-700 text-white"
+            onClick={redirectToReports}
+            disabled={isLoading}
+          >
+            {isLoading ? 'Loading...' : 'Export Performance Data'}
+          </Button>
+          <Button
+            className="bg-gray-700 hover:bg-gray-800 text-white"
+            onClick={redirectToReports}
+            disabled={isLoading}
+          >
+            {isLoading ? 'Loading...' : 'System Status Report'}
+          </Button>
+        </div>
+      </div>
+    </div>
+  </div>
+);
   }
   
   

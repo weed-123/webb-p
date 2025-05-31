@@ -112,23 +112,43 @@ export default function RealtimeMonitor() {
                 </div>
               )}
 
-              {/* Plant Health Metrics */}
-              {latestData.plant_health && (
-                <div className="bg-neutral-800/40 p-4 rounded-lg text-sm text-muted-foreground mt-2">
-                  <h4 className="font-semibold mb-2">Plant Health Metrics</h4>
-                  <p>Overall Health: <span className="text-white">{latestData.plant_health.overall_health || "N/A"}</span></p>
-                  <p>Growth Rate: <span className="text-white">{latestData.plant_health.growth_rate || "N/A"}</span></p>
-                </div>
-              )}
+{/* Plant Health Metrics */}
+{latestData.plant_health && (
+  <div className="rounded-lg p-4 border border-green-500 bg-green-900/10 text-sm mt-2">
+    <h4 className="font-semibold text-green-300 mb-2 flex items-center gap-1">
+      🌿 Plant Health Metrics
+    </h4>
+    <div className="grid grid-cols-2 gap-4 text-muted-foreground">
+      <div>
+        <span className="text-xs uppercase text-gray-400">Overall Health</span>
+        <div className="text-white font-medium">{latestData.plant_health.overall_health || "N/A"}</div>
+      </div>
+      <div>
+        <span className="text-xs uppercase text-gray-400">Growth Rate</span>
+        <div className="text-white font-medium">{latestData.plant_health.growth_rate || "N/A"}</div>
+      </div>
+    </div>
+  </div>
+)}
 
-              {/* Weed Detection Metrics */}
-              {latestData.weed_detection && (
-                <div className="bg-neutral-800/40 p-4 rounded-lg text-sm text-muted-foreground mt-2">
-                  <h4 className="font-semibold mb-2">Weed Detection</h4>
-                  <p>Weed Count: <span className="text-white">{latestData.weed_detection.weed_count ?? "N/A"}</span></p>
-                  <p>Weed Coverage: <span className="text-white">{latestData.weed_detection.weed_coverage_percentage ?? "N/A"}%</span></p>
-                </div>
-              )}
+        {/* Weed Detection */}
+        {latestData.weed_detection && (
+          <div className="rounded-lg p-4 border border-yellow-500 bg-yellow-900/10 text-sm mt-2">
+            <h4 className="font-semibold text-yellow-300 mb-2 flex items-center gap-1">
+              🌾 Weed Detection
+            </h4>
+            <div className="grid grid-cols-2 gap-4 text-muted-foreground">
+              <div>
+                <span className="text-xs uppercase text-gray-400">Weed Count</span>
+                <div className="text-white font-medium">{latestData.weed_detection.weed_count ?? "N/A"}</div>
+              </div>
+              <div>
+                <span className="text-xs uppercase text-gray-400">Coverage</span>
+                <div className="text-white font-medium">{latestData.weed_detection.weed_coverage_percentage ?? "N/A"}%</div>
+              </div>
+            </div>
+          </div>
+        )}
             </div>
           )}
         </div>

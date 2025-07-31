@@ -12,8 +12,8 @@ import { db } from '@/lib/firebase';
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogFooter,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
@@ -30,32 +30,21 @@ type UserData = {
   isDirectCreated?: boolean;
 };
 
-type LogEntry = {
-  timestamp: string;
-  description: string;
-};
-
 export default function AdminSettings() {
   const { user } = useAuth();
   const router = useRouter();
   const [isLoaded, setIsLoaded] = useState(false);
   const [users, setUsers] = useState<UserData[]>([]);
-  const [logs, setLogs] = useState<LogEntry[]>([]);
-  const [newLog, setNewLog] = useState('');
-  const [showLogDialog, setShowLogDialog] = useState(false);
   const [loading, setLoading] = useState(true);
   const [userToDelete, setUserToDelete] = useState<UserData | null>(null);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [isDeleting, setIsDeleting] = useState(false);
   const [editUser, setEditUser] = useState<UserData | null>(null);
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [editName, setEditName] = useState('');
   const [editRole, setEditRole] = useState('');
   const [systemUptime, setSystemUptime] = useState<number | null>(null);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [laserPower, setLaserPower] = useState<number>(0);
 
   useEffect(() => {
     setIsLoaded(true);
@@ -79,23 +68,9 @@ export default function AdminSettings() {
     setLoading(false);
   }, [user]);
 
-  const fetchLogs = () => {
-    const logsRef = ref(db, 'maintenance_logs');
-    onValue(logsRef, (snapshot) => {
-      const data = snapshot.val();
-      if (data) {
-        const formattedLogs = Object.values(data) as LogEntry[];
-        setLogs(formattedLogs.reverse());
-      } else {
-        setLogs([]);
-      }
-    });
-  };
-
   useEffect(() => {
     if (user) {
       fetchUsers();
-      fetchLogs();
     }
   }, [user, fetchUsers]);
 
@@ -117,11 +92,6 @@ export default function AdminSettings() {
 
     return () => clearInterval(interval);
   }, []);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const handleSaveSettings = async () => {
-    const controlRef = ref(db, 'control/laser');
-    await update(controlRef, { power: laserPower });
-  };
 
   const handleDeleteUser = async () => {
     if (!userToDelete) return;
@@ -169,18 +139,6 @@ export default function AdminSettings() {
     }
   };
 
-  const handleAddLog = async () => {
-    if (!newLog.trim()) return;
-    const timestamp = new Date().toISOString().replace('T', ' ').split('.')[0];
-    const logRef = ref(db, 'maintenance_logs');
-    await push(logRef, {
-      timestamp,
-      description: newLog.trim()
-    });
-    setShowLogDialog(false);
-    setNewLog('');
-  };
-
   if (!isLoaded || !user) return null;
 
   return (
@@ -207,19 +165,6 @@ export default function AdminSettings() {
                 <div className="text-sm text-gray-500">{users.length === 1 ? 'User' : 'Users'}</div>
               </div>
             </div>
-          </div>
-
-          {/* Maintenance Log */}
-          <div className="bg-muted/50 rounded-lg p-6 shadow-sm">
-            <h2 className="text-xl font-semibold mb-4">Maintenance Log</h2>
-            <div className="space-y-3 mb-4">
-              {logs.map((log, index) => (
-                <div key={index} className="p-2 bg-secondary rounded">
-                  <span className="text-secondary-foreground">{log.timestamp} - {log.description}</span>
-                </div>
-              ))}
-            </div>
-            <Button className="w-full bg-slate-700 hover:bg-slate-800" onClick={() => setShowLogDialog(true)}>Add Log Entry</Button>
           </div>
 
           {/* User Management */}
@@ -260,19 +205,13 @@ export default function AdminSettings() {
             <h2 className="text-xl font-semibold mb-4">System Settings</h2>
             <div className="space-y-4">
               <div>
-                <label className="block text-secondary-foreground mb-1">Laser Power Level (%)</label>
-                <Input type="text" className="w-full" defaultValue="75" />
-              </div>
-              <div>
                 <label className="block text-secondary-foreground mb-1">Operating Mode</label>
                 <select className="w-full p-2 border rounded appearance-none bg-muted/50">
                   <option>Automatic</option>
                   <option>Manual</option>
-                  <option>Diagnostic</option>
+                 
                 </select>
               </div>
-              <Button className="w-full bg-slate-700 hover:bg-slate-800">Save Settings</Button>
-              <Button className="w-full bg-red-500 hover:bg-red-600">Restart System</Button>
             </div>
           </div>
         </div>
@@ -314,23 +253,6 @@ export default function AdminSettings() {
             <DialogFooter>
               <Button variant="outline" onClick={() => setShowDeleteDialog(false)}>Cancel</Button>
               <Button className="bg-red-500 hover:bg-red-600" onClick={handleDeleteUser}>Delete</Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
-
-        {/* Add Log Entry Dialog */}
-        <Dialog open={showLogDialog} onOpenChange={setShowLogDialog}>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Add Maintenance Log</DialogTitle>
-            </DialogHeader>
-            <div>
-              <label>Log Description</label>
-              <Input value={newLog} onChange={(e) => setNewLog(e.target.value)} placeholder="Describe the maintenance..." />
-            </div>
-            <DialogFooter>
-              <Button variant="outline" onClick={() => setShowLogDialog(false)}>Cancel</Button>
-              <Button onClick={handleAddLog}>Add Log</Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>

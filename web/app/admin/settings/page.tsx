@@ -7,7 +7,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { SignupDialog } from '@/components/signup-dialog';
-import { ref, get, remove, update, push, onValue } from 'firebase/database';
+import { ref, get, remove, update } from 'firebase/database';
 import { db } from '@/lib/firebase';
 import {
   Dialog,
@@ -39,7 +39,7 @@ export default function AdminSettings() {
   const [userToDelete, setUserToDelete] = useState<UserData | null>(null);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
-  const [isDeleting, setIsDeleting] = useState(false);
+  const [setIsDeleting] = useState(false);
   const [editUser, setEditUser] = useState<UserData | null>(null);
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [editName, setEditName] = useState('');
@@ -97,7 +97,7 @@ export default function AdminSettings() {
     if (!userToDelete) return;
 
     try {
-      setIsDeleting(true);
+     
       setDeleteError(null);
       await remove(ref(db, `users/${userToDelete.uid}`));
       await fetchUsers();
@@ -109,7 +109,7 @@ export default function AdminSettings() {
         error instanceof Error ? error.message : "An unknown error occurred"
       );
     } finally {
-      setIsDeleting(false);
+     
     }
   };
 

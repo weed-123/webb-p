@@ -209,19 +209,6 @@ export default function AdminSettings() {
             </div>
           </div>
 
-          {/* Maintenance Log */}
-          <div className="bg-muted/50 rounded-lg p-6 shadow-sm">
-            <h2 className="text-xl font-semibold mb-4">Maintenance Log</h2>
-            <div className="space-y-3 mb-4">
-              {logs.map((log, index) => (
-                <div key={index} className="p-2 bg-secondary rounded">
-                  <span className="text-secondary-foreground">{log.timestamp} - {log.description}</span>
-                </div>
-              ))}
-            </div>
-            <Button className="w-full bg-slate-700 hover:bg-slate-800" onClick={() => setShowLogDialog(true)}>Add Log Entry</Button>
-          </div>
-
           {/* User Management */}
           <div className="bg-muted/50 rounded-lg p-6 shadow-sm">
             <h2 className="text-xl font-semibold mb-4">User Management</h2>
@@ -268,11 +255,8 @@ export default function AdminSettings() {
                 <select className="w-full p-2 border rounded appearance-none bg-muted/50">
                   <option>Automatic</option>
                   <option>Manual</option>
-                  <option>Diagnostic</option>
                 </select>
               </div>
-              <Button className="w-full bg-slate-700 hover:bg-slate-800">Save Settings</Button>
-              <Button className="w-full bg-red-500 hover:bg-red-600">Restart System</Button>
             </div>
           </div>
         </div>

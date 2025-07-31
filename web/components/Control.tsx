@@ -5,7 +5,6 @@ import { ref, set, onValue } from "firebase/database";
 import { useState, useEffect } from "react";
 import { Play, Pause, StopCircle, Loader } from "lucide-react";
 
-
 export default function Control() {
 	const [operation, setOperation] = useState(0);
 	const [isLoading, setIsLoading] = useState(false);
@@ -41,6 +40,34 @@ export default function Control() {
 			setError(null);
 			await set(ref(db, 'control/operation'), 2);
 			console.log('Pause operation sent to database');
+		} finally {
+			setIsLoading(false);
+		}
+	};
+
+	const handleStop = async () => {
+		try {
+			setIsLoading(true);
+			setError(null);
+			await set(ref(db, 'control/operation'), 0);
+			console.log('Stop operation sent to database');
+		} catch (err) {
+			console.error('Error stopping operation:', err);
+			setError('Failed to stop operation');
+		} finally {
+			setIsLoading(false);
+		}
+	};
+
+	const handleResume = async () => {
+		try {
+			setIsLoading(true);
+			setError(null);
+			await set(ref(db, 'control/operation'), 1);
+			console.log('Resume operation sent to database');
+		} catch (err) {
+			console.error('Error resuming operation:', err);
+			setError('Failed to resume operation');
 		} finally {
 			setIsLoading(false);
 		}
@@ -112,72 +139,106 @@ export default function Control() {
 	};
 
 	return (
-	  <div className="rounded-xl bg-muted/50 p-5">
-      <div className="flex flex-col gap-2">
-        <h2 className="text-lg font-bold">Control</h2>
-        <Separator className="my-3" />
-        {error && <p className="text-destructive text-sm mb-2">{error}</p>}
-        
-        {/* Status Indicator */}
-        <div className="mb-4">
-          {getStatusIndicator()}
-        </div>
-        
-        <div className="flex flex-col gap-2">
-          <Button 
-            onClick={handleStart} 
-            disabled={![0, 2, 3].includes(operation) || isLoading}
-            className="flex items-center gap-2"
-          >
-            {isLoading ? (
-              <>
-                <Loader className="animate-spin h-4 w-4" />
-                <span>Starting...</span>
-              </>
-            ) : (
-              <>
-                <Play className="h-4 w-4" />
-                <span>Start Operation</span>
-              </>
-            )}
-          </Button>
-          <Button 
-            onClick={handlePause} 
-            disabled={![1, 5].includes(operation) || isLoading}
-            className="flex items-center gap-2"
-          >
-            {isLoading ? (
-              <>
-                <Loader className="animate-spin h-4 w-4" />
-                <span>Pausing...</span>
-              </>
-            ) : (
-              <>
-                <Pause className="h-4 w-4" />
-                <span>Pause System</span>
-              </>
-            )}
-          </Button>
-          <Button 
-            variant="destructive" 
-            onClick={handleEmergency}
-            disabled={![1, 2, 5].includes(operation) || isLoading}
-            className="flex items-center gap-2"
-          >
-            {isLoading ? (
-              <>
-                <Loader className="animate-spin h-4 w-4" />
-                <span>Stopping...</span>
-              </>
-            ) : (
-              <>
-                <StopCircle className="h-4 w-4" />
-                <span>Emergency Stop</span>
-              </>
-            )}
-          </Button>
-        </div>
-      </div>
-	  </div>
+		<div className="rounded-xl bg-muted/50 p-5">
+			<div className="flex flex-col gap-2">
+				<h2 className="text-lg font-bold">Control</h2>
+				<Separator className="my-3" />
+				{error && <p className="text-destructive text-sm mb-2">{error}</p>}
+				
+				{/* Status Indicator */}
+				<div className="mb-4">
+					{getStatusIndicator()}
+				</div>
+				
+				<div className="flex flex-col gap-2">
+					<Button 
+						onClick={handleStart} 
+						disabled={![0, 2, 3].includes(operation) || isLoading}
+						className="flex items-center gap-2"
+					>
+						{isLoading ? (
+							<>
+								<Loader className="animate-spin h-4 w-4" />
+								<span>Starting...</span>
+							</>
+						) : (
+							<>
+								<Play className="h-4 w-4" />
+								<span>Start Operation</span>
+							</>
+						)}
+					</Button>
+					<Button 
+						onClick={handlePause} 
+						disabled={![1, 5].includes(operation) || isLoading}
+						className="flex items-center gap-2"
+					>
+						{isLoading ? (
+							<>
+								<Loader className="animate-spin h-4 w-4" />
+								<span>Pausing...</span>
+							</>
+						) : (
+							<>
+								<Pause className="h-4 w-4" />
+								<span>Pause System</span>
+							</>
+						)}
+					</Button>
+					<Button 
+						onClick={handleStop} 
+						disabled={operation !== 1 || isLoading}
+						className="flex items-center gap-2"
+					>
+						{isLoading ? (
+							<>
+								<Loader className="animate-spin h-4 w-4" />
+								<span>Stopping...</span>
+							</>
+						) : (
+							<>
+								<StopCircle className="h-4 w-4" />
+								<span>Stop Operation</span>
+							</>
+						)}
+					</Button>
+					<Button 
+						onClick={handleResume} 
+						disabled={operation !== 2 || isLoading}
+						className="flex items-center gap-2"
+					>
+						{isLoading ? (
+							<>
+								<Loader className="animate-spin h-4 w-4" />
+								<span>Resuming...</span>
+							</>
+						) : (
+							<>
+								<Play className="h-4 w-4" />
+								<span>Resume Operation</span>
+							</>
+						)}
+					</Button>
+					<Button 
+						variant="destructive" 
+						onClick={handleEmergency}
+						disabled={![1, 2, 5].includes(operation) || isLoading}
+						className="flex items-center gap-2"
+					>
+						{isLoading ? (
+							<>
+								<Loader className="animate-spin h-4 w-4" />
+								<span>Stopping...</span>
+							</>
+						) : (
+							<>
+								<StopCircle className="h-4 w-4" />
+								<span>Emergency Stop</span>
+							</>
+						)}
+					</Button>
+				</div>
+			</div>
+		</div>
 	);
 }

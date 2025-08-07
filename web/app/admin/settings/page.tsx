@@ -30,12 +30,6 @@ type UserData = {
   isDirectCreated?: boolean;
 };
 
-type RobotPerformanceData = {
-  totalWeeds: number;
-  targetedWeeds: number;
-  systemUptime: number; // This can be your uptime value
-};
-
 export default function AdminSettings() {
   const { user } = useAuth();
   const router = useRouter();
@@ -50,8 +44,6 @@ export default function AdminSettings() {
   const [editName, setEditName] = useState('');
   const [editRole, setEditRole] = useState('');
   const [systemUptime, setSystemUptime] = useState<number | null>(null);
-  const [accuracy, setAccuracy] = useState<number | null>(null);
-  const [efficiency, setEfficiency] = useState<number | null>(null);
 
   useEffect(() => {
     setIsLoaded(true);
@@ -80,30 +72,6 @@ export default function AdminSettings() {
       fetchUsers();
     }
   }, [user, fetchUsers]);
-
-  const fetchRobotPerformance = useCallback(async () => {
-    const todayKey = new Date().toLocaleDateString('en-US', {
-      month: '2-digit',
-      day: '2-digit',
-      year: 'numeric',
-    }).replace(/\//g, '-');
-
-    const performanceRef = ref(db, `performance/${todayKey}`);
-    const snapshot = await get(performanceRef);
-    if (snapshot.exists()) {
-      const data = snapshot.val();
-      const totalWeeds = data.totalWeeds;
-      const targetedWeeds = data.targetedWeeds;
-      const systemUptime = data.systemUptime;
-
-      setAccuracy(totalWeeds > 0 ? (targetedWeeds / totalWeeds) * 100 : 0);
-      setEfficiency(systemUptime);
-    }
-  }, []);
-
-  useEffect(() => {
-    fetchRobotPerformance();
-  }, [fetchRobotPerformance]);
 
   useEffect(() => {
     const todayKey = new Date().toLocaleDateString('en-US', {
@@ -183,16 +151,14 @@ export default function AdminSettings() {
             <div className="flex justify-center items-center mb-4">
               <div className="text-center">
                 <div className="text-6xl font-bold text-secondary-foreground">
-                  {accuracy !== null ? `${accuracy.toFixed(2)}%` : 'Loading...'}
+                  {systemUptime !== null ? `${systemUptime}%` : 'Loading...'}
                 </div>
-                <div className="text-sm text-gray-500">Accuracy</div>
+                <div className="text-sm text-gray-500">System Uptime</div>
               </div>
               <div className="mx-12"></div>
               <div className="text-center">
-                <div className="text-6xl font-bold text-secondary-foreground">
-                  {efficiency !== null ? `${efficiency.toFixed(2)}%` : 'Loading...'}
-                </div>
-                <div className="text-sm text-gray-500">Efficiency</div>
+                <div className="text-6xl font-bold text-secondary-foreground">{users.length}</div>
+                <div className="text-sm text-gray-500">{users.length === 1 ? 'User' : 'Users'}</div>
               </div>
             </div>
           </div>

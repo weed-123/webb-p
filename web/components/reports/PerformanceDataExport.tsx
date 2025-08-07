@@ -12,7 +12,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { toast } from "sonner";
 import { db } from "@/lib/firebase";
-import { ref, get, set } from "firebase/database";
+import { ref, get } from "firebase/database";
 import { cn } from "@/lib/utils";
 
 interface ReportEntry {

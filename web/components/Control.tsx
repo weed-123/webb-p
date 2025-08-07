@@ -3,7 +3,7 @@ import { Button } from "./ui/button";
 import { db } from "@/lib/firebase";
 import { ref, set, onValue } from "firebase/database";
 import { useState, useEffect } from "react";
-import { Play, Pause, StopCircle, Loader } from "lucide-react";
+import { Play, StopCircle, Loader } from "lucide-react";
 
 export default function Control() {
 	const [operation, setOperation] = useState(0);

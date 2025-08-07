@@ -7,7 +7,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { SignupDialog } from '@/components/signup-dialog';
-import { ref, get, remove, update} from 'firebase/database';
+import { ref, get, remove, update } from 'firebase/database';
 import { db } from '@/lib/firebase';
 import {
   Dialog,
@@ -30,6 +30,12 @@ type UserData = {
   isDirectCreated?: boolean;
 };
 
+type RobotPerformanceData = {
+  totalWeeds: number;
+  targetedWeeds: number;
+  systemUptime: number; // This can be your uptime value
+};
+
 export default function AdminSettings() {
   const { user } = useAuth();
   const router = useRouter();
@@ -39,12 +45,13 @@ export default function AdminSettings() {
   const [userToDelete, setUserToDelete] = useState<UserData | null>(null);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
- // const [isDeleting, setIsDeleting] = useState(false);
   const [editUser, setEditUser] = useState<UserData | null>(null);
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [editName, setEditName] = useState('');
   const [editRole, setEditRole] = useState('');
   const [systemUptime, setSystemUptime] = useState<number | null>(null);
+  const [accuracy, setAccuracy] = useState<number | null>(null);
+  const [efficiency, setEfficiency] = useState<number | null>(null);
 
   useEffect(() => {
     setIsLoaded(true);
@@ -74,6 +81,30 @@ export default function AdminSettings() {
     }
   }, [user, fetchUsers]);
 
+  const fetchRobotPerformance = useCallback(async () => {
+    const todayKey = new Date().toLocaleDateString('en-US', {
+      month: '2-digit',
+      day: '2-digit',
+      year: 'numeric',
+    }).replace(/\//g, '-');
+
+    const performanceRef = ref(db, `performance/${todayKey}`);
+    const snapshot = await get(performanceRef);
+    if (snapshot.exists()) {
+      const data = snapshot.val();
+      const totalWeeds = data.totalWeeds;
+      const targetedWeeds = data.targetedWeeds;
+      const systemUptime = data.systemUptime;
+
+      setAccuracy(totalWeeds > 0 ? (targetedWeeds / totalWeeds) * 100 : 0);
+      setEfficiency(systemUptime);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchRobotPerformance();
+  }, [fetchRobotPerformance]);
+
   useEffect(() => {
     const todayKey = new Date().toLocaleDateString('en-US', {
       month: '2-digit',
@@ -97,7 +128,6 @@ export default function AdminSettings() {
     if (!userToDelete) return;
 
     try {
-  //    setIsDeleting(true);
       setDeleteError(null);
       await remove(ref(db, `users/${userToDelete.uid}`));
       await fetchUsers();
@@ -108,8 +138,6 @@ export default function AdminSettings() {
       setDeleteError(
         error instanceof Error ? error.message : "An unknown error occurred"
       );
-    } finally {
- //     setIsDeleting(false);
     }
   };
 
@@ -155,14 +183,16 @@ export default function AdminSettings() {
             <div className="flex justify-center items-center mb-4">
               <div className="text-center">
                 <div className="text-6xl font-bold text-secondary-foreground">
-                  {systemUptime !== null ? `${systemUptime}%` : 'Loading...'}
+                  {accuracy !== null ? `${accuracy.toFixed(2)}%` : 'Loading...'}
                 </div>
-                <div className="text-sm text-gray-500">System Uptime</div>
+                <div className="text-sm text-gray-500">Accuracy</div>
               </div>
               <div className="mx-12"></div>
               <div className="text-center">
-                <div className="text-6xl font-bold text-secondary-foreground">{users.length}</div>
-                <div className="text-sm text-gray-500">{users.length === 1 ? 'User' : 'Users'}</div>
+                <div className="text-6xl font-bold text-secondary-foreground">
+                  {efficiency !== null ? `${efficiency.toFixed(2)}%` : 'Loading...'}
+                </div>
+                <div className="text-sm text-gray-500">Efficiency</div>
               </div>
             </div>
           </div>
@@ -198,21 +228,6 @@ export default function AdminSettings() {
               )}
             </div>
             <SignupDialog onUserAdded={fetchUsers} />
-          </div>
-
-          {/* System Settings */}
-          <div className="bg-muted/50 rounded-lg p-6 shadow-sm">
-            <h2 className="text-xl font-semibold mb-4">System Settings</h2>
-            <div className="space-y-4">
-              <div>
-                <label className="block text-secondary-foreground mb-1">Operating Mode</label>
-                <select className="w-full p-2 border rounded appearance-none bg-muted/50">
-                  <option>Automatic</option>
-                  <option>Manual</option>
-                 
-                </select>
-              </div>
-            </div>
           </div>
         </div>
 

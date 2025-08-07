@@ -1,24 +1,18 @@
-// PerformanceDataExport.tsx (finalized for single-date fetch with styled export buttons)
 "use client";
 
 import * as React from "react";
 import { format } from "date-fns";
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { CalendarIcon, FileDown } from "lucide-react";
+import { CalendarIcon } from "lucide-react";
 import { saveAs } from "file-saver";
 import * as XLSX from "xlsx";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { toast } from "sonner";
 import { db } from "@/lib/firebase";
-import { ref, get } from "firebase/database";
+import { ref, get, set } from "firebase/database";
 import { cn } from "@/lib/utils";
 
 interface ReportEntry {
@@ -32,11 +26,14 @@ interface ReportEntry {
   average_power?: number;
   system_uptime?: number;
   alerts?: string[];
+  latest_weed_count?: number;  // Latest detected weed count
+  total_weed_count?: number;    // Total weed count (new field)
 }
 
 export default function PerformanceDataExport() {
   const [date, setDate] = React.useState<Date | undefined>();
   const [data, setData] = React.useState<ReportEntry | null>(null);
+  const [totalWeedCount, setTotalWeedCount] = React.useState<number>(0); // State for total weed count
   const [loading, setLoading] = React.useState(false);
 
   const fetchReportData = async () => {
@@ -46,11 +43,20 @@ export default function PerformanceDataExport() {
     try {
       const snapshot = await get(ref(db, `report/${key}`));
       if (snapshot.exists()) {
-        setData({ date: key, ...snapshot.val() });
-        toast("Data fetched", { description: 'Showing data for ${key}' });
+        const reportData = { date: key, ...snapshot.val() };
+        setData(reportData);
+
+        // Set the total weed count from the fetched report data
+        if (reportData.total_weed_count !== undefined) {
+          setTotalWeedCount(reportData.total_weed_count);
+        } else {
+          setTotalWeedCount(0); // Default to 0 if not found
+        }
+
+        toast("Data fetched", { description: `Showing data for ${key}` });
       } else {
         setData(null);
-        toast("No data", { description: 'No data for ${key}' });
+        toast("No data", { description: `No data for ${key}` });
       }
     } catch (err) {
       console.error(err);
@@ -65,12 +71,8 @@ export default function PerformanceDataExport() {
           Date: data.date,
           "Start Time": data.start_time ?? "None",
           "End Time": data.end_time ?? "None",
-          "Total Area (ha)": data.total_area ?? "None",
-          "Efficiency (%)": data.treatment_efficiency ?? "None",
-          "Battery Usage (%)": data.battery_usage ?? "None",
-          "Laser Ops": data.laser_operations ?? "None",
-          "Power (W)": data.average_power ?? "None",
           "Uptime (%)": data.system_uptime ?? "None",
+          "Total Weed Count": totalWeedCount, // Display total weed count
         },
       ]
     : [];

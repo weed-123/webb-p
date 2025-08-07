@@ -2,7 +2,6 @@
 
 import { DashboardLayout } from '@/components/layout/dashboard-layout';
 import PerformanceDataExport from '@/components/reports/PerformanceDataExport';
-
 export default function OperatorReports() {
 
   return (

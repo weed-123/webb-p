@@ -45,34 +45,6 @@ export default function Control() {
 		}
 	};
 
-	const handleStop = async () => {
-		try {
-			setIsLoading(true);
-			setError(null);
-			await set(ref(db, 'control/operation'), 0);
-			console.log('Stop operation sent to database');
-		} catch (err) {
-			console.error('Error stopping operation:', err);
-			setError('Failed to stop operation');
-		} finally {
-			setIsLoading(false);
-		}
-	};
-
-	const handleResume = async () => {
-		try {
-			setIsLoading(true);
-			setError(null);
-			await set(ref(db, 'control/operation'), 1);
-			console.log('Resume operation sent to database');
-		} catch (err) {
-			console.error('Error resuming operation:', err);
-			setError('Failed to resume operation');
-		} finally {
-			setIsLoading(false);
-		}
-	};
-
 	const handleEmergency = async () => {
 		try {
 			setIsLoading(true);
@@ -117,8 +89,8 @@ export default function Control() {
 			case 2:
 				return (
 					<div className="flex items-center gap-2 p-3 bg-orange-500/20 rounded-lg">
-						<Pause className="h-5 w-5 text-orange-500" />
-						<span className="text-orange-500 font-medium">Paused</span>
+						<StopCircle className="h-5 w-5 text-orange-500" />
+						<span className="text-orange-500 font-medium">Stopped</span>
 					</div>
 				);
 			case 3:
@@ -180,42 +152,8 @@ export default function Control() {
 							</>
 						) : (
 							<>
-								<Pause className="h-4 w-4" />
-								<span>Pause System</span>
-							</>
-						)}
-					</Button>
-					<Button 
-						onClick={handleStop} 
-						disabled={operation !== 1 || isLoading}
-						className="flex items-center gap-2"
-					>
-						{isLoading ? (
-							<>
-								<Loader className="animate-spin h-4 w-4" />
-								<span>Stopping...</span>
-							</>
-						) : (
-							<>
 								<StopCircle className="h-4 w-4" />
-								<span>Stop Operation</span>
-							</>
-						)}
-					</Button>
-					<Button 
-						onClick={handleResume} 
-						disabled={operation !== 2 || isLoading}
-						className="flex items-center gap-2"
-					>
-						{isLoading ? (
-							<>
-								<Loader className="animate-spin h-4 w-4" />
-								<span>Resuming...</span>
-							</>
-						) : (
-							<>
-								<Play className="h-4 w-4" />
-								<span>Resume Operation</span>
+								<span>Stop</span>
 							</>
 						)}
 					</Button>

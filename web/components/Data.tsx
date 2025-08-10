@@ -12,18 +12,14 @@ export default function Data() {
   const [isLoading, setIsLoading] = useState(false);
   const [debugInfo, setDebugInfo] = useState<string | null>(null);
   const [accuracy, setAccuracy] = useState(0); // State for accuracy
-  const [weedCount, setWeedCount] = useState(0); // State for weed count
 
   useEffect(() => {
     const latestRef = ref(db, "latest"); // Reference to the latest data
     const unsubscribe = onValue(latestRef, (snapshot) => {
       const data = snapshot.val();
       if (data) {
-        // Update accuracy and weed count based on the latest data structure
+        // Update accuracy based on the latest data structure
         setAccuracy(data.accuracy || 0);
-        if (data.weed_detection) {
-          setWeedCount(data.weed_detection.weed_count || 0);
-        }
       } else {
         console.error('Latest data is not available');
       }
@@ -88,7 +84,6 @@ export default function Data() {
               <span>Accuracy</span>
               <span className="text-white font-semibold">{accuracy}%</span> {/* Display accuracy */}
             </div>
-           
           </div>
         </div>
 

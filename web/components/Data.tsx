@@ -88,7 +88,7 @@ export default function Data() {
               <span>Accuracy</span>
               <span className="text-white font-semibold">{accuracy}%</span> {/* Display accuracy */}
             </div>
-
+           
           </div>
         </div>
 

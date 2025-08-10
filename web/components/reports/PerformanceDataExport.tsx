@@ -19,13 +19,7 @@ interface ReportEntry {
   date: string;
   start_time?: string;
   end_time?: string;
-  total_area?: number;
-  treatment_efficiency?: number;
-  battery_usage?: number;
-  laser_operations?: number;
-  average_power?: number;
   system_uptime?: number;
-  alerts?: string[];
   latest_weed_count?: number;  // Latest detected weed count
   total_weed_count?: number;    // Total weed count (new field)
 }

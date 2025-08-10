@@ -1,14 +1,38 @@
 import { Separator } from "@/components/ui/separator";
 import { Button } from "./ui/button";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/auth-context";
+import { ref, onValue } from "firebase/database"; // Import necessary Firebase functions
+import { db } from "@/lib/firebase"; // Import your Firebase database
 
 export default function Data() {
   const router = useRouter();
   const { user } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [debugInfo, setDebugInfo] = useState<string | null>(null);
+  const [accuracy, setAccuracy] = useState(0); // State for accuracy
+  const [weedCount, setWeedCount] = useState(0); // State for weed count
+
+  useEffect(() => {
+    const latestRef = ref(db, "latest"); // Reference to the latest data
+    const unsubscribe = onValue(latestRef, (snapshot) => {
+      const data = snapshot.val();
+      if (data) {
+        // Update accuracy and weed count based on the latest data structure
+        setAccuracy(data.accuracy || 0);
+        if (data.weed_detection) {
+          setWeedCount(data.weed_detection.weed_count || 0);
+        }
+      } else {
+        console.error('Latest data is not available');
+      }
+    }, (error) => {
+      console.error('Error fetching latest data:', error);
+    });
+
+    return () => unsubscribe(); // Cleanup listener on unmount
+  }, []);
 
   const redirectToReports = async () => {
     setIsLoading(true);
@@ -16,7 +40,7 @@ export default function Data() {
       setDebugInfo("Checking authentication status...");
       const response = await fetch('/api/auth/check-token');
       const data = await response.json();
-      
+
       setDebugInfo(`Auth response: ${JSON.stringify(data)}`);
       
       if (data.authenticated) {
@@ -61,13 +85,10 @@ export default function Data() {
           <h3 className="text-sm font-medium text-white mb-2">📊 Performance Metrics</h3>
           <div className="grid grid-cols-1 gap-2 text-sm text-muted-foreground">
             <div className="flex justify-between">
-              <span>Efficiency</span>
-              <span className="text-white font-semibold">85%</span>
-            </div>
-            <div className="flex justify-between">
               <span>Accuracy</span>
-              <span className="text-white font-semibold">95%</span>
+              <span className="text-white font-semibold">{accuracy}%</span> {/* Display accuracy */}
             </div>
+
           </div>
         </div>
 

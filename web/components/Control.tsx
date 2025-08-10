@@ -45,20 +45,6 @@ export default function Control() {
 		}
 	};
 
-	const handleEmergency = async () => {
-		try {
-			setIsLoading(true);
-			setError(null);
-			await set(ref(db, 'control/operation'), 3);
-			console.log('Emergency stop sent to database');
-		} catch (err) {
-			console.error('Error sending emergency stop:', err);
-			setError('Failed to send emergency stop');
-		} finally {
-			setIsLoading(false);
-		}
-	};
-
 	// Helper function to render the status indicator
 	const getStatusIndicator = () => {
 		if (isLoading) {
@@ -93,13 +79,6 @@ export default function Control() {
 						<span className="text-orange-500 font-medium">Stopped</span>
 					</div>
 				);
-			case 3:
-				return (
-					<div className="flex items-center gap-2 p-3 bg-destructive/20 rounded-lg">
-						<StopCircle className="h-5 w-5 text-destructive" />
-						<span className="text-destructive font-medium">Emergency Stopped</span>
-					</div>
-				);
 			default:
 				return (
 					<div className="flex items-center gap-2 p-3 bg-muted rounded-lg">
@@ -125,7 +104,7 @@ export default function Control() {
 				<div className="flex flex-col gap-2">
 					<Button 
 						onClick={handleStart} 
-						disabled={![0, 2, 3].includes(operation) || isLoading}
+						disabled={![0, 2].includes(operation) || isLoading}
 						className="flex items-center gap-2"
 					>
 						{isLoading ? (
@@ -143,25 +122,7 @@ export default function Control() {
 					<Button 
 						onClick={handlePause} 
 						disabled={![1, 5].includes(operation) || isLoading}
-						className="flex items-center gap-2"
-					>
-						{isLoading ? (
-							<>
-								<Loader className="animate-spin h-4 w-4" />
-								<span>Pausing...</span>
-							</>
-						) : (
-							<>
-								<StopCircle className="h-4 w-4" />
-								<span>Stop</span>
-							</>
-						)}
-					</Button>
-					<Button 
-						variant="destructive" 
-						onClick={handleEmergency}
-						disabled={![1, 2, 5].includes(operation) || isLoading}
-						className="flex items-center gap-2"
+						className="flex items-center gap-2 bg-red-500 hover:bg-red-600 text-white"
 					>
 						{isLoading ? (
 							<>
@@ -171,7 +132,7 @@ export default function Control() {
 						) : (
 							<>
 								<StopCircle className="h-4 w-4" />
-								<span>Emergency Stop</span>
+								<span>Stop</span>
 							</>
 						)}
 					</Button>

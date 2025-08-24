@@ -11,16 +11,12 @@ export default function Data() {
   const { user } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [debugInfo, setDebugInfo] = useState<string | null>(null);
-  const [accuracy, setAccuracy] = useState(0); // State for accuracy
 
   useEffect(() => {
     const latestRef = ref(db, "latest"); // Reference to the latest data
     const unsubscribe = onValue(latestRef, (snapshot) => {
       const data = snapshot.val();
-      if (data) {
-        // Update accuracy based on the latest data structure
-        setAccuracy(data.accuracy || 0);
-      } else {
+      if (!data) {
         console.error('Latest data is not available');
       }
     }, (error) => {
@@ -76,17 +72,6 @@ export default function Data() {
           </div>
         )}
 
-        {/* Performance Metrics */}
-        <div className="rounded-xl p-5 bg-neutral-900 border border-gray-700 shadow-sm">
-          <h3 className="text-sm font-medium text-white mb-2">📊 Performance Metrics</h3>
-          <div className="grid grid-cols-1 gap-2 text-sm text-muted-foreground">
-            <div className="flex justify-between">
-              <span>Accuracy</span>
-              <span className="text-white font-semibold">{accuracy}%</span> {/* Display accuracy */}
-            </div>
-          </div>
-        </div>
-
         {/* Reports Generation */}
         <div className="rounded-xl p-5 bg-neutral-900 border border-gray-700 shadow-sm">
           <h3 className="text-sm font-medium text-white mb-3">📝 Reports Generation</h3>
@@ -96,7 +81,7 @@ export default function Data() {
               onClick={redirectToReports}
               disabled={isLoading}
             >
-              {isLoading ? 'Loading...' : 'Export Performance Data'}
+              {isLoading ? 'Loading...' : 'Generate Reports'}
             </Button>
           </div>
         </div>

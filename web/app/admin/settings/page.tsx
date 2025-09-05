@@ -136,104 +136,105 @@ export default function AdminSettings() {
   };
   if (!isLoaded || !user) return null;
 
-  return (
-    <DashboardLayout>
-      <div className="space-y-6">
-        <div className="flex justify-between items-center">
-          <h1 className="text-2xl font-bold">System Administration</h1>
-        </div>
-<div className="grid gap-6 grid-cols-1 md:grid-cols-2">
-  {/* System Overview */}
-  <div className="bg-muted/50 rounded-lg p-6 shadow-sm">
-    <h2 className="text-xl font-semibold mb-4">System Overview</h2>
-    <div className="flex flex-col justify-center items-center mb-4">
-      <div className="text-center mb-4">
-        <div className="text-6xl font-bold text-secondary-foreground">
-          {systemRunning !== null ? (systemRunning ? 'System Running' : 'System Idle') : 'Loading...'}
-        </div>
-        <div className="text-sm text-gray-500">System Status</div>
+return (
+  <DashboardLayout>
+    <div className="space-y-6">
+      <div className="flex justify-between items-center">
+        <h1 className="text-2xl font-bold">System Administration</h1>
       </div>
-      <div className="text-center">
-        <div className="text-6xl font-bold text-secondary-foreground">{users.length}</div>
-        <div className="text-sm text-gray-500">{users.length === 1 ? 'User' : 'Users'}</div>
-      </div>
-    </div>
-  </div>
-
-  {/* User Management */}
-  <div className="bg-muted/50 rounded-lg p-6 shadow-sm">
-    <h2 className="text-xl font-semibold mb-4">User Management</h2>
-    <div className="space-y-3 mb-4">
-      {loading ? (
-        <div className="p-2 text-center">Loading users...</div>
-      ) : users.length > 0 ? (
-        users.map((userData) => (
-          <div key={userData.uid} className="flex justify-between items-center p-2 bg-secondary rounded">
-            <div className="overflow-hidden">
-              <span className="font-medium text-secondary-foreground">
-                {userData.fullName || 'No Name'}
-              </span>
-              <span className="text-gray-500 text-sm ml-2">({userData.email})</span>
-              <div className="text-xs text-gray-400">Role: {userData.role}</div>
+      <div className="grid gap-6 grid-cols-1 md:grid-cols-2">
+        {/* System Overview */}
+        <div className="bg-muted/50 rounded-lg p-6 shadow-sm">
+          <h2 className="text-xl font-semibold mb-4">System Overview</h2>
+          <div className="flex flex-col justify-center items-center mb-4">
+            <div className="text-center mb-4">
+              <div className="text-4xl font-bold text-secondary-foreground">
+                {systemRunning !== null ? (systemRunning ? 'System Running' : 'System Idle') : 'Loading...'}
+              </div>
+              <div className="text-sm text-gray-500">System Status</div>
             </div>
-            <div className="flex gap-2">
-              <Button className="bg-blue-500 hover:bg-blue-600" onClick={() => confirmEdit(userData)}>
-                <Pencil className="h-4 w-4 mr-1" /> Edit
-              </Button>
-              <Button className="bg-red-500 hover:bg-red-600" onClick={() => confirmDelete(userData)}>
-                <Trash2 className="h-4 w-4 mr-1" /> Delete
-              </Button>
+            <div className="text-center">
+              <div className="text-4xl font-bold text-secondary-foreground">{users.length}</div>
+              <div className="text-sm text-gray-500">{users.length === 1 ? 'User' : 'Users'}</div>
             </div>
           </div>
-        ))
-      ) : (
-        <div className="p-2 text-center">No users found</div>
-      )}
-    </div>
-    <SignupDialog onUserAdded={fetchUsers} />
-  </div>
-</div>
-        {/* Edit User Dialog */}
-        <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Edit User</DialogTitle>
-            </DialogHeader>
-            <div className="space-y-4">
-              <div>
-                <label>Full Name</label>
-                <Input value={editName} onChange={(e) => setEditName(e.target.value)} />
-              </div>
-              <div>
-                <label>Role</label>
-                <select className="w-full p-2 border rounded" value={editRole} onChange={(e) => setEditRole(e.target.value)}>
-                  <option value="operator">Operator</option>
-                  <option value="admin">Admin</option>
-                </select>
-              </div>
-            </div>
-            <DialogFooter>
-              <Button variant="outline" onClick={() => setShowEditDialog(false)}>Cancel</Button>
-              <Button onClick={handleEditSave}>Save Changes</Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+        </div>
 
-        {/* Delete Dialog */}
-        <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Confirm User Deletion</DialogTitle>
-              <DialogDescription>Are you sure you want to delete this user?</DialogDescription>
-            </DialogHeader>
-            {deleteError && <p className="text-sm text-red-500">{deleteError}</p>}
-            <DialogFooter>
-              <Button variant="outline" onClick={() => setShowDeleteDialog(false)}>Cancel</Button>
-              <Button className="bg-red-500 hover:bg-red-600" onClick={handleDeleteUser}>Delete</Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+        {/* User Management */}
+        <div className="bg-muted/50 rounded-lg p-6 shadow-sm">
+          <h2 className="text-xl font-semibold mb-4">User Management</h2>
+          <div className="space-y-3 mb-4">
+            {loading ? (
+              <div className="p-2 text-center">Loading users...</div>
+            ) : users.length > 0 ? (
+              users.map((userData) => (
+                <div key={userData.uid} className="flex justify-between items-center p-2 bg-secondary rounded">
+                  <div className="overflow-hidden flex-grow mr-2">
+                    <span className="font-medium text-secondary-foreground">
+                      {userData.fullName || 'No Name'} 
+                      <span className="text-gray-500 text-sm ml-2">({userData.email})</span>
+                    </span>
+                    <div className="text-xs text-gray-400">Role: {userData.role}</div>
+                  </div>
+                  <div className="flex gap-2">
+                    <Button className="bg-blue-500 hover:bg-blue-600" onClick={() => confirmEdit(userData)}>
+                      <Pencil className="h-4 w-4 mr-1" /> Edit
+                    </Button>
+                    <Button className="bg-red-500 hover:bg-red-600" onClick={() => confirmDelete(userData)}>
+                      <Trash2 className="h-4 w-4 mr-1" /> Delete
+                    </Button>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="p-2 text-center">No users found</div>
+            )}
+          </div>
+          <SignupDialog onUserAdded={fetchUsers} />
+        </div>
       </div>
-    </DashboardLayout>
-  );
+
+      {/* Edit User Dialog */}
+      <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit User</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <label>Full Name</label>
+              <Input value={editName} onChange={(e) => setEditName(e.target.value)} />
+            </div>
+            <div>
+              <label>Role</label>
+              <select className="w-full p-2 border rounded" value={editRole} onChange={(e) => setEditRole(e.target.value)}>
+                <option value="operator">Operator</option>
+                <option value="admin">Admin</option>
+              </select>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowEditDialog(false)}>Cancel</Button>
+            <Button onClick={handleEditSave}>Save Changes</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Dialog */}
+      <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Confirm User Deletion</DialogTitle>
+            <DialogDescription>Are you sure you want to delete this user?</DialogDescription>
+          </DialogHeader>
+          {deleteError && <p className="text-sm text-red-500">{deleteError}</p>}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowDeleteDialog(false)}>Cancel</Button>
+            <Button className="bg-red-500 hover:bg-red-600" onClick={handleDeleteUser}>Delete</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </div>
+  </DashboardLayout>
+);
 }

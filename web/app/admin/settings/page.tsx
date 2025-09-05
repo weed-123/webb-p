@@ -43,7 +43,7 @@ export default function AdminSettings() {
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [editName, setEditName] = useState('');
   const [editRole, setEditRole] = useState('');
-  const [systemUptime, setSystemUptime] = useState<number | null>(null);
+  const [systemRunning, setSystemRunning] = useState<boolean | null>(null);
 
   useEffect(() => {
     setIsLoaded(true);
@@ -81,10 +81,10 @@ export default function AdminSettings() {
     }).replace(/\//g, '-');
 
     const interval = setInterval(() => {
-      const uptimeRef = ref(db, `report/${todayKey}/system_uptime`);
-      get(uptimeRef).then(snapshot => {
+      const runningRef = ref(db, `report/${todayKey}/system_running`); // Updated path
+      get(runningRef).then(snapshot => {
         if (snapshot.exists()) {
-          setSystemUptime(snapshot.val());
+          setSystemRunning(snapshot.val());
         }
       });
     }, 5000);
@@ -134,7 +134,6 @@ export default function AdminSettings() {
       console.error('Edit failed', err);
     }
   };
-
   if (!isLoaded || !user) return null;
 
   return (
@@ -143,60 +142,57 @@ export default function AdminSettings() {
         <div className="flex justify-between items-center">
           <h1 className="text-2xl font-bold">System Administration</h1>
         </div>
-
-        <div className="grid gap-6 grid-cols-1 md:grid-cols-2">
-          {/* System Overview */}
-          <div className="bg-muted/50 rounded-lg p-6 shadow-sm">
-            <h2 className="text-xl font-semibold mb-4">System Overview</h2>
-            <div className="flex justify-center items-center mb-4">
-              <div className="text-center">
-                <div className="text-6xl font-bold text-secondary-foreground">
-                  {systemUptime !== null ? `${systemUptime}%` : 'Loading...'}
-                </div>
-                <div className="text-sm text-gray-500">System Uptime</div>
-              </div>
-              <div className="mx-12"></div>
-              <div className="text-center">
-                <div className="text-6xl font-bold text-secondary-foreground">{users.length}</div>
-                <div className="text-sm text-gray-500">{users.length === 1 ? 'User' : 'Users'}</div>
-              </div>
-            </div>
-          </div>
-
-          {/* User Management */}
-          <div className="bg-muted/50 rounded-lg p-6 shadow-sm">
-            <h2 className="text-xl font-semibold mb-4">User Management</h2>
-            <div className="space-y-3 mb-4">
-              {loading ? (
-                <div className="p-2 text-center">Loading users...</div>
-              ) : users.length > 0 ? (
-                users.map((userData) => (
-                  <div key={userData.uid} className="flex justify-between items-center p-2 bg-secondary rounded">
-                    <div className="overflow-hidden">
-                      <span className="font-medium text-secondary-foreground">
-                        {userData.fullName || 'No Name'}
-                      </span>
-                      <span className="text-gray-500 text-sm ml-2">({userData.email})</span>
-                      <div className="text-xs text-gray-400">Role: {userData.role}</div>
-                    </div>
-                    <div className="flex gap-2">
-                      <Button className="bg-blue-500 hover:bg-blue-600" onClick={() => confirmEdit(userData)}>
-                        <Pencil className="h-4 w-4 mr-1" /> Edit
-                      </Button>
-                      <Button className="bg-red-500 hover:bg-red-600" onClick={() => confirmDelete(userData)}>
-                        <Trash2 className="h-4 w-4 mr-1" /> Delete
-                      </Button>
-                    </div>
-                  </div>
-                ))
-              ) : (
-                <div className="p-2 text-center">No users found</div>
-              )}
-            </div>
-            <SignupDialog onUserAdded={fetchUsers} />
-          </div>
+<div className="grid gap-6 grid-cols-1 md:grid-cols-2">
+  {/* System Overview */}
+  <div className="bg-muted/50 rounded-lg p-6 shadow-sm">
+    <h2 className="text-xl font-semibold mb-4">System Overview</h2>
+    <div className="flex flex-col justify-center items-center mb-4">
+      <div className="text-center mb-4">
+        <div className="text-6xl font-bold text-secondary-foreground">
+          {systemRunning !== null ? (systemRunning ? 'System Running' : 'System Idle') : 'Loading...'}
         </div>
+        <div className="text-sm text-gray-500">System Status</div>
+      </div>
+      <div className="text-center">
+        <div className="text-6xl font-bold text-secondary-foreground">{users.length}</div>
+        <div className="text-sm text-gray-500">{users.length === 1 ? 'User' : 'Users'}</div>
+      </div>
+    </div>
+  </div>
 
+  {/* User Management */}
+  <div className="bg-muted/50 rounded-lg p-6 shadow-sm">
+    <h2 className="text-xl font-semibold mb-4">User Management</h2>
+    <div className="space-y-3 mb-4">
+      {loading ? (
+        <div className="p-2 text-center">Loading users...</div>
+      ) : users.length > 0 ? (
+        users.map((userData) => (
+          <div key={userData.uid} className="flex justify-between items-center p-2 bg-secondary rounded">
+            <div className="overflow-hidden">
+              <span className="font-medium text-secondary-foreground">
+                {userData.fullName || 'No Name'}
+              </span>
+              <span className="text-gray-500 text-sm ml-2">({userData.email})</span>
+              <div className="text-xs text-gray-400">Role: {userData.role}</div>
+            </div>
+            <div className="flex gap-2">
+              <Button className="bg-blue-500 hover:bg-blue-600" onClick={() => confirmEdit(userData)}>
+                <Pencil className="h-4 w-4 mr-1" /> Edit
+              </Button>
+              <Button className="bg-red-500 hover:bg-red-600" onClick={() => confirmDelete(userData)}>
+                <Trash2 className="h-4 w-4 mr-1" /> Delete
+              </Button>
+            </div>
+          </div>
+        ))
+      ) : (
+        <div className="p-2 text-center">No users found</div>
+      )}
+    </div>
+    <SignupDialog onUserAdded={fetchUsers} />
+  </div>
+</div>
         {/* Edit User Dialog */}
         <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
           <DialogContent>

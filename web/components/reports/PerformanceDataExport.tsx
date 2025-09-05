@@ -65,7 +65,6 @@ export default function PerformanceDataExport() {
           Date: data.date,
           "Start Time": data.start_time ?? "None",
           "End Time": data.end_time ?? "None",
-          "Uptime (%)": data.system_uptime ?? "None",
           "Total Weed Count": totalWeedCount, // Display total weed count
         },
       ]
